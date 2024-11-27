@@ -1,103 +1,78 @@
-import Image from "next/image";
+'use client'; // Marking this file as a client component
 
-const Home = () => {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import { useState } from 'react'; // Importing the useState hook
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+export default function Home() {
+    const [tasks, setTasks] = useState<any[]>([]); // State to hold tasks
+
+    // Function to add a task
+    function addTask() {
+        const taskInput = (document.getElementById('task-input') as HTMLInputElement).value.trim();
+        if (taskInput !== '') {
+            const newTask = { text: taskInput, done: false };
+            setTasks([...tasks, newTask]); // Update tasks state
+            (document.getElementById('task-input') as HTMLInputElement).value = ''; // Clear input
+        }
+    }
+
+    // Function to toggle task done/undone
+    function toggleDone(index: number) {
+        const updatedTasks = [...tasks];
+        updatedTasks[index].done = !updatedTasks[index].done;
+        setTasks(updatedTasks); // Update tasks state
+    }
+
+    // Function to edit a task
+    function editTask(index: number) {
+        const newTaskText = prompt('Edit Task', tasks[index].text);
+        if (newTaskText && newTaskText.trim() !== '') {
+            const updatedTasks = [...tasks];
+            updatedTasks[index].text = newTaskText.trim();
+            setTasks(updatedTasks); // Update tasks state
+        }
+    }
+
+    // Function to delete a task
+    function deleteTask(index: number) {
+        const updatedTasks = tasks.filter((_, i) => i !== index);
+        setTasks(updatedTasks); // Update tasks state
+    }
+
+    // Function to search tasks
+    function searchTasks() {
+        const searchInput = (document.getElementById('search') as HTMLInputElement).value.toLowerCase();
+        const filteredTasks = tasks.filter((task) =>
+            task.text.toLowerCase().includes(searchInput)
+        );
+        displayTasks(filteredTasks); // Display filtered tasks
+    }
+
+    // Function to display filtered tasks (for search)
+    function displayTasks(tasksToDisplay: any[] = tasks) {
+        return tasksToDisplay.map((task, index) => (
+            <li key={index} className={`task-item ${task.done ? 'done' : ''}`}>
+                <span>{task.text}</span>
+                <button onClick={() => toggleDone(index)}>{task.done ? 'Undo' : 'Done'}</button>
+                <button onClick={() => editTask(index)}>Edit</button>
+                <button onClick={() => deleteTask(index)}>Delete</button>
+            </li>
+        ));
+    }
+
+    return (
+        <div>
+            <h1>To-Do List</h1>
+            <input type="text" id="task-input" placeholder="Enter a task" />
+            <button onClick={addTask}>Add Task</button>
+
+            <input
+                type="text"
+                id="search"
+                placeholder="Search tasks"
+                onChange={searchTasks}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
-};
 
-export default Home;
+            <ul id="task-list">{displayTasks()}</ul>
+        </div>
+    );
+}
